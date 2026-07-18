@@ -13,17 +13,34 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "0.4.0-alpha.1"
 SKILL_ROOT = ROOT / "skills" / "auto-route-for-codex"
-TRANSLATIONS = {
-    "README.md": "README.zh-CN.md",
-    "docs/architecture.md": "docs/i18n/zh-CN/architecture.md",
-    "docs/compatibility.md": "docs/i18n/zh-CN/compatibility.md",
-    "docs/configuration.md": "docs/i18n/zh-CN/configuration.md",
-    "docs/faq.md": "docs/i18n/zh-CN/faq.md",
-    "docs/installation.md": "docs/i18n/zh-CN/installation.md",
-    "docs/privacy-and-data-flow.md": "docs/i18n/zh-CN/privacy-and-data-flow.md",
-    "docs/routing-policy.md": "docs/i18n/zh-CN/routing-policy.md",
-    "docs/troubleshooting.md": "docs/i18n/zh-CN/troubleshooting.md",
-}
+README_VARIANTS = (
+    ("English", "README.md"),
+    ("Português (Brasil)", "README.pt-BR.md"),
+    ("简体中文", "README.zh-CN.md"),
+    ("繁體中文", "README.zh-TW.md"),
+    ("日本語", "README.ja.md"),
+    ("한국어", "README.ko.md"),
+    ("Türkçe", "README.tr.md"),
+    ("Русский", "README.ru.md"),
+    ("Tiếng Việt", "README.vi.md"),
+    ("ไทย", "README.th.md"),
+    ("Deutsch", "README.de.md"),
+    ("Español", "README.es.md"),
+)
+TRANSLATIONS = tuple(
+    ("README.md", translation)
+    for _, translation in README_VARIANTS
+    if translation != "README.md"
+) + (
+    ("docs/architecture.md", "docs/i18n/zh-CN/architecture.md"),
+    ("docs/compatibility.md", "docs/i18n/zh-CN/compatibility.md"),
+    ("docs/configuration.md", "docs/i18n/zh-CN/configuration.md"),
+    ("docs/faq.md", "docs/i18n/zh-CN/faq.md"),
+    ("docs/installation.md", "docs/i18n/zh-CN/installation.md"),
+    ("docs/privacy-and-data-flow.md", "docs/i18n/zh-CN/privacy-and-data-flow.md"),
+    ("docs/routing-policy.md", "docs/i18n/zh-CN/routing-policy.md"),
+    ("docs/troubleshooting.md", "docs/i18n/zh-CN/troubleshooting.md"),
+)
 REQUIRED_FILES = {
     ".agents/plugins/marketplace.json",
     ".codex-plugin/plugin.json",
@@ -53,6 +70,7 @@ REQUIRED_FILES = {
     "SECURITY.md",
     "SUPPORT.md",
     "assets/icon.svg",
+    "docs/i18n/README.md",
     "scripts/build_release.py",
     "scripts/verify_public_repo.py",
     "skills/auto-route-for-codex/SKILL.md",
@@ -63,8 +81,8 @@ REQUIRED_FILES = {
     "skills/auto-route-for-codex/scripts/validate_contracts.py",
     "skills/auto-route-for-codex/tests/fixtures/cases.json",
     "skills/auto-route-for-codex/tests/test_route_task.py",
-    *TRANSLATIONS.keys(),
-    *TRANSLATIONS.values(),
+    *(source for source, _ in TRANSLATIONS),
+    *(translation for _, translation in TRANSLATIONS),
 }
 UUID_PATTERN = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
@@ -162,7 +180,7 @@ def frontmatter(text: str) -> dict[str, str]:
 
 
 def verify_translations() -> None:
-    for source, translation in TRANSLATIONS.items():
+    for source, translation in TRANSLATIONS:
         source_path = ROOT / source
         translation_path = ROOT / translation
         if not source_path.is_file() or not translation_path.is_file():
@@ -175,6 +193,56 @@ def verify_translations() -> None:
         }
         if fields != expected:
             fail(f"translation_metadata:{translation}")
+
+
+def verify_language_navigation() -> None:
+    source_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    source_sections = source_text.count("\n## ")
+    source_fences = source_text.count("```")
+    source_bullets = sum(line.startswith("- ") for line in source_text.splitlines())
+    source_table_rows = sum(line.startswith("| ") for line in source_text.splitlines())
+    source_links = len(MARKDOWN_LINK.findall(source_text))
+    required_tokens = (
+        "codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.4.0-alpha.1",
+        "codex plugin add auto-route-for-codex@jacob101519",
+        "$auto-route-for-codex",
+        "v0.4.0-alpha.1",
+        "stay + none|efficiency + none + keep",
+        ".codex-plugin/plugin.json",
+        ".agents/plugins/marketplace.json",
+        "skills/auto-route-for-codex/",
+        "docs/i18n/zh-CN/",
+        "scripts/verify_public_repo.py",
+        "scripts/build_release.py",
+        "SHA256SUMS",
+    )
+    for _, current in README_VARIANTS:
+        text = (ROOT / current).read_text(encoding="utf-8")
+        header = "\n".join(text.splitlines()[:20])
+        if " | " not in header:
+            fail(f"language_navigation_missing:{current}")
+        positions = []
+        for label, target in README_VARIANTS:
+            if label not in header:
+                fail(f"language_label_missing:{current}:{target}")
+            positions.append(header.index(label))
+            if target != current and f"]({target})" not in header:
+                fail(f"language_link_missing:{current}:{target}")
+        if positions != sorted(positions):
+            fail(f"language_order:{current}")
+        if f"]({current})" in header:
+            fail(f"current_language_linked:{current}")
+        if (
+            text.count("\n## ") != source_sections
+            or text.count("```") != source_fences
+            or sum(line.startswith("- ") for line in text.splitlines()) != source_bullets
+            or sum(line.startswith("| ") for line in text.splitlines()) != source_table_rows
+            or len(MARKDOWN_LINK.findall(text)) != source_links
+        ):
+            fail(f"readme_structure:{current}")
+        for token in required_tokens:
+            if token not in text:
+                fail(f"readme_required_token:{current}:{token}")
 
 
 def verify_privacy(files: dict[str, Path]) -> int:
@@ -225,6 +293,7 @@ def main() -> int:
     files = observed_files()
     verify_manifests()
     verify_translations()
+    verify_language_navigation()
     scanned = verify_privacy(files)
     links = verify_markdown_links(files)
     summary = {
@@ -233,6 +302,7 @@ def main() -> int:
         "files": len(files),
         "privacy_scanned": scanned,
         "translation_pairs": len(TRANSLATIONS),
+        "readme_locales": len(README_VARIANTS),
         "local_links_checked": links,
         "license_sha256": verify_license(),
     }

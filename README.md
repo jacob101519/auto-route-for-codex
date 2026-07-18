@@ -1,6 +1,6 @@
 # Auto Route for Codex
 
-[English](README.md) | [Simplified Chinese](README.zh-CN.md)
+**Language:** English | [Português (Brasil)](README.pt-BR.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Türkçe](README.tr.md) | [Русский](README.ru.md) | [Tiếng Việt](README.vi.md) | [ไทย](README.th.md) | [Deutsch](README.de.md) | [Español](README.es.md)
 
 > Alpha community project. Not an official OpenAI product.
 

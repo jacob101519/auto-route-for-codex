@@ -6,7 +6,7 @@ last_synced_version: 0.4.0-alpha.1
 
 # Auto Route for Codex
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+**语言：** [English](README.md) | [Português (Brasil)](README.pt-BR.md) | 简体中文 | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Türkçe](README.tr.md) | [Русский](README.ru.md) | [Tiếng Việt](README.vi.md) | [ไทย](README.th.md) | [Deutsch](README.de.md) | [Español](README.es.md)
 
 > Alpha（早期测试）社区项目，不是 OpenAI 官方产品。
 

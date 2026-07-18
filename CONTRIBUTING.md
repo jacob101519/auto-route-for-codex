@@ -8,6 +8,8 @@ Thank you for improving Auto Route for Codex.
 - Keep the public edition recommendation-only.
 - Do not add local paths, task identifiers, credentials, logs, or private catalogs.
 - Update the authoritative English document and its complete Simplified Chinese translation together.
+- Keep every localized README complete rather than replacing it with a summary.
+- Preserve each translation's `translation_of`, `source_revision`, and `last_synced_version` metadata.
 - Add or update deterministic tests for routing changes.
 
 ## Development checks
@@ -22,6 +24,10 @@ python3 scripts/build_release.py --output-dir dist
 ## Pull requests
 
 A pull request should explain the problem, the contract or behavior changed, privacy impact, compatibility impact, and verification performed. Keep unrelated changes separate.
+
+## Translation scope
+
+English is authoritative. Simplified Chinese covers the complete README and all deep documentation. The other supported locales cover the complete README; they do not imply that every file under `docs/` has been translated. See [the translation matrix](docs/i18n/README.md).
 
 ## Routing-policy changes
 
