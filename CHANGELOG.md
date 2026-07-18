@@ -2,6 +2,18 @@
 
 All notable public changes are recorded here.
 
+## [Unreleased]
+
+### Added
+
+- native-language navigation across 12 complete README variants;
+- complete README translations for Portuguese (Brazil), Traditional Chinese, Japanese, Korean, Turkish, Russian, Vietnamese, Thai, German, and Spanish;
+- a translation coverage matrix that distinguishes README coverage from deep-documentation coverage.
+
+### Changed
+
+- public verification now enforces translation metadata, language links, README structure, required commands, and privacy scanning across all supported locales.
+
 ## [0.4.0-alpha.1] - 2026-07-18
 
 ### Added
