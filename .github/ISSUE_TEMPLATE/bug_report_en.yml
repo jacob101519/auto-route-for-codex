@@ -1,0 +1,54 @@
+name: Bug report (English)
+description: Report a reproducible defect in the public edition.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private task text, local paths, or session identifiers.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 0.4.0-alpha.1
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Codex surface
+      options:
+        - Codex Desktop
+        - Codex CLI
+        - Codex IDE extension
+        - Other or unknown
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic data and list the smallest safe sequence that reproduces the defect.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed credentials, private task text, local paths, and session identifiers.
+          required: true
+        - label: I confirmed this is not a private security report.
+          required: true

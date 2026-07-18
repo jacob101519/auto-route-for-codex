@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/jacob101519/auto-route-for-codex/security/advisories/new
+    about: Report a vulnerability privately. Do not open a public issue.
+  - name: Community discussion
+    url: https://github.com/jacob101519/auto-route-for-codex/discussions
+    about: Ask usage questions or discuss ideas that are not yet actionable issues.

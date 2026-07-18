@@ -1,0 +1,35 @@
+name: Feature request (English)
+description: Propose a public-safe improvement with a concrete use case.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Explain the user-visible problem without private task content.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+    validations:
+      required: true
+  - type: dropdown
+    id: boundary
+    attributes:
+      label: Does this preserve the recommendation-only public boundary?
+      options:
+        - "Yes"
+        - "Unsure"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Acceptance evidence
+      description: Describe tests or observable behavior that would prove completion.
+    validations:
+      required: true

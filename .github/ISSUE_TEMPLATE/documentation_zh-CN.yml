@@ -1,0 +1,33 @@
+name: 文档问题（简体中文）
+description: 报告缺失、不准确、不一致或过期的文档。
+title: "[Docs][zh-CN]: "
+labels: [documentation]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Document path or URL（文档路径或网址）
+      placeholder: docs/i18n/zh-CN/installation.md
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language（语言）
+      options:
+        - English（英语）
+        - Simplified Chinese（简体中文）
+        - Both（两者）
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: 哪些内容错误或缺失？
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: 建议修改或 evidence（证据）
+      description: 如果事实会随版本变化，请提供 authoritative evidence（权威证据）。

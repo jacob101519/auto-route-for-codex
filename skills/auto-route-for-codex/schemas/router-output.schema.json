@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://public.invalid/auto-route-for-codex/router-output.schema.json",
+  "title": "Public Recommendation Router Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "decision", "current", "recommended", "tool_overrides", "effective_task_kind", "reason_codes"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "status": {"enum": ["fit", "mismatch", "unknown"]},
+    "decision": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "benefit", "transfer", "source_disposition", "evidence_status", "reason_code"],
+      "properties": {
+        "action": {"const": "stay"}, "benefit": {"enum": ["none", "efficiency"]}, "transfer": {"const": "none"},
+        "source_disposition": {"const": "keep"}, "evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]},
+        "reason_code": {"const": "public_preview_recommendation_only"}
+      }
+    },
+    "current": {
+      "type": "object", "additionalProperties": false, "required": ["model", "model_role", "effort", "topology", "evidence_status"],
+      "properties": {
+        "model": {"type": "string", "pattern": "^(unknown|[A-Za-z0-9][A-Za-z0-9._+-]{0,127})$"}, "model_role": {"enum": ["unknown", "throughput", "balanced", "deep"]},
+        "effort": {"enum": ["unknown", "none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+        "topology": {"enum": ["not_observed", "parallel"]}, "evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]}
+      }
+    },
+    "recommended": {
+      "type": "object", "additionalProperties": false, "required": ["model_role", "model", "effort", "thinking", "topology", "resolution"],
+      "properties": {
+        "model_role": {"enum": ["throughput", "balanced", "deep"]}, "model": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"},
+        "effort": {"type": ["string", "null"], "enum": [null, "none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+        "thinking": {"type": ["string", "null"], "enum": [null, "none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+        "topology": {"enum": ["single", "single_deep", "parallel"]}, "resolution": {"enum": ["resolved", "unresolved"]}
+      }
+    },
+    "tool_overrides": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "object", "additionalProperties": false, "required": ["model", "thinking"], "properties": {"model": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}, "thinking": {"enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]}}}
+      ]
+    },
+    "effective_task_kind": {"enum": ["simple_answer", "local_edit", "implementation", "architecture", "migration", "deep_research", "final_decision", "batch"]},
+    "reason_codes": {"type": "array", "items": {"const": "public_preview_recommendation_only"}, "minItems": 1, "maxItems": 1}
+  }
+}

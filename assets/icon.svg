@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Auto Model Router</title>
+  <rect width="64" height="64" rx="16" fill="#10A37F"/>
+  <path d="M16 18h15v7H23v8h8v7H16V18Zm17 0h15v22H33v-7h8v-8h-8v-7Z" fill="#fff"/>
+  <path d="m24 49 8-7 8 7" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,20 @@
+{
+  "name": "jacob101519",
+  "interface": {
+    "displayName": "Jacob Open Source Plugins"
+  },
+  "plugins": [
+    {
+      "name": "auto-route-for-codex",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://public.invalid/auto-route-for-codex/router-input.schema.json",
+  "title": "Public Recommendation Router Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "current", "profile", "catalog_evidence_status", "host_evidence_status", "host_models", "host_thinking", "host_role_models", "catalog_provenance", "host_provenance"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_status", "model", "effort", "observed_at"],
+      "properties": {
+        "evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]},
+        "model": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^(unknown|[A-Za-z0-9][A-Za-z0-9._+-]*)$"},
+        "effort": {"enum": ["unknown", "none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+        "observed_at": {"type": ["string", "null"]}
+      },
+      "allOf": [{"if": {"properties": {"evidence_status": {"const": "verified"}}}, "then": {"properties": {"observed_at": {"type": "string", "minLength": 1}}}}]
+    },
+    "profile": {"$ref": "#/$defs/profile"},
+    "catalog_evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]},
+    "host_evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]},
+    "host_models": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$", "not": {"const": "unknown"}}, "uniqueItems": true},
+    "host_thinking": {"type": "array", "items": {"enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]}, "uniqueItems": true},
+    "host_role_models": {
+      "type": "object", "additionalProperties": false, "required": ["throughput", "balanced", "deep"],
+      "properties": {"throughput": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}, "balanced": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}, "deep": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}}
+    },
+    "catalog_provenance": {"$ref": "#/$defs/catalogProvenance"},
+    "host_provenance": {"$ref": "#/$defs/hostProvenance"}
+  },
+  "$defs": {
+    "catalogProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "receipt_id", "evidence_kind", "source", "observed_at", "ttl_seconds", "content_sha256"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "receipt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "evidence_kind": {"const": "catalog"},
+        "source": {"const": "catalog_observation"},
+        "observed_at": {"type": "string", "minLength": 1},
+        "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 604800},
+        "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "hostProvenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "receipt_id", "evidence_kind", "source", "observed_at", "ttl_seconds", "content_sha256"],
+      "properties": {
+        "schema_version": {"const": "1.0"}, "receipt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "evidence_kind": {"const": "host_capability"}, "source": {"const": "host_tool_schema"}, "observed_at": {"type": "string", "minLength": 1},
+        "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 600}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_kind", "scope", "risk", "duration", "priority"],
+      "properties": {
+        "task_kind": {"enum": ["simple_answer", "local_edit", "implementation", "architecture", "migration", "deep_research", "final_decision", "batch"]},
+        "scope": {"enum": ["single", "multi_module", "cross_system", "portfolio"]},
+        "risk": {"enum": ["low", "moderate", "high", "irreversible"]},
+        "duration": {"enum": ["short", "multi_stage", "long_running"]},
+        "priority": {"enum": ["latency", "cost", "balanced", "quality_first", "max_quality"]},
+        "ambiguity": {"enum": ["low", "medium", "high"]},
+        "verification_strength": {"enum": ["weak", "partial", "strong"]},
+        "context_portability": {"enum": ["self_contained", "workspace_recoverable", "thread_dependent"]},
+        "architecture_signals": {"type": "integer", "minimum": 0},
+        "repeated_failures": {"type": "integer", "minimum": 0},
+        "parallel_workstreams": {"type": "integer", "minimum": 0},
+        "coupling": {"enum": ["low", "medium", "high"]},
+        "independently_verifiable": {"type": "boolean"},
+        "write_conflict_risk": {"enum": ["low", "medium", "high"]},
+        "delegation_authorized": {"type": "boolean"},
+        "parallelism_observed": {"type": "boolean"},
+        "single_hard_problem": {"type": "boolean"},
+        "max_insufficient_evidence": {"type": "boolean"}
+      }
+    }
+  }
+}

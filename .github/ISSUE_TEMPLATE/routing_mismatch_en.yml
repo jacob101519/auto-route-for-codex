@@ -1,0 +1,54 @@
+name: Routing mismatch (English)
+description: Report a recommendation that appears too weak, too strong, or unresolved.
+title: "[Routing mismatch]: "
+labels: [routing]
+body:
+  - type: markdown
+    attributes:
+      value: Share only the structured, privacy-bounded profile. Never paste private task text or local receipts.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 0.4.0-alpha.1
+    validations:
+      required: true
+  - type: dropdown
+    id: mismatch
+    attributes:
+      label: Mismatch type
+      options:
+        - Recommendation is too weak
+        - Recommendation is too strong
+        - Recommendation is unresolved unexpectedly
+        - Topology is incorrect
+    validations:
+      required: true
+  - type: textarea
+    id: profile
+    attributes:
+      label: Sanitized router input
+      description: Include only enumerated fields accepted by router-input.schema.json.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Router output
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why the recommendation is mismatched
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: The report contains no task prose, local path, credential, session identifier, or private catalog.
+          required: true

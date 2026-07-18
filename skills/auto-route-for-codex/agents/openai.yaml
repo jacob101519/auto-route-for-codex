@@ -1,0 +1,7 @@
+interface:
+  display_name: "Auto Route for Codex"
+  short_description: "Recommend a public-safe Codex model setting"
+  default_prompt: "$auto-route-for-codex"
+
+policy:
+  allow_implicit_invocation: false

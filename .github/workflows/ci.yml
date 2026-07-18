@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify public repository
+        run: python3 scripts/verify_public_repo.py
+      - name: Run router unit tests
+        run: python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
+      - name: Validate router contracts
+        run: python3 skills/auto-route-for-codex/scripts/validate_contracts.py
+      - name: Build deterministic release artifacts
+        run: python3 scripts/build_release.py --output-dir dist
+      - name: Upload release candidates
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-route-for-codex-${{ github.sha }}
+          path: |
+            dist/auto-route-for-codex-0.4.0-alpha.1.zip
+            dist/SHA256SUMS
+          if-no-files-found: error

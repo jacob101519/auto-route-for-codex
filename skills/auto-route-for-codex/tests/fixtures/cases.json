@@ -1,0 +1,50 @@
+[
+  {
+    "name": "architecture_recommends_deep_xhigh_without_fabricated_model",
+    "input": {
+      "schema_version": "1.0",
+      "current": {"evidence_status": "verified", "model": "host-model", "effort": "medium", "observed_at": "2026-07-14T00:00:00Z"},
+      "profile": {"task_kind": "architecture", "scope": "cross_system", "risk": "moderate", "duration": "multi_stage", "priority": "quality_first"},
+      "catalog_evidence_status": "verified",
+      "host_evidence_status": "verified",
+      "host_models": ["host-model"],
+      "host_thinking": ["medium", "xhigh"],
+      "host_role_models": {"throughput": null, "balanced": "host-model", "deep": "host-model"},
+      "catalog_provenance": {"schema_version": "1.0", "receipt_id": "public-catalog-1", "evidence_kind": "catalog", "source": "catalog_observation", "observed_at": "2026-07-14T00:00:00Z", "ttl_seconds": 604800, "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+      "host_provenance": {"schema_version": "1.0", "receipt_id": "public-host-1", "evidence_kind": "host_capability", "source": "host_tool_schema", "observed_at": "2026-07-14T00:00:00Z", "ttl_seconds": 604800, "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+    },
+    "expected": {"model_role": "deep", "model": "host-model", "thinking": "xhigh", "topology": "single", "resolution": "resolved", "benefit": "none"}
+  },
+  {
+    "name": "sustained_batch_recommends_efficiency_but_stays",
+    "input": {
+      "schema_version": "1.0",
+      "current": {"evidence_status": "verified", "model": "host-model", "effort": "max", "observed_at": "2026-07-14T00:00:00Z"},
+      "profile": {"task_kind": "batch", "scope": "single", "risk": "low", "duration": "long_running", "priority": "cost"},
+      "catalog_evidence_status": "verified",
+      "host_evidence_status": "verified",
+      "host_models": ["host-model"],
+      "host_thinking": ["low", "max"],
+      "host_role_models": {"throughput": null, "balanced": "host-model", "deep": null},
+      "catalog_provenance": {"schema_version": "1.0", "receipt_id": "public-catalog-2", "evidence_kind": "catalog", "source": "catalog_observation", "observed_at": "2026-07-14T00:00:00Z", "ttl_seconds": 604800, "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+      "host_provenance": {"schema_version": "1.0", "receipt_id": "public-host-2", "evidence_kind": "host_capability", "source": "host_tool_schema", "observed_at": "2026-07-14T00:00:00Z", "ttl_seconds": 604800, "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"}
+    },
+    "expected": {"model_role": "balanced", "model": "host-model", "thinking": "low", "topology": "single", "resolution": "resolved", "benefit": "efficiency"}
+  },
+  {
+    "name": "unknown_long_batch_stays_without_efficiency",
+    "input": {
+      "schema_version": "1.0",
+      "current": {"evidence_status": "unknown", "model": "unknown", "effort": "unknown", "observed_at": null},
+      "profile": {"task_kind": "batch", "scope": "single", "risk": "low", "duration": "long_running", "priority": "cost"},
+      "catalog_evidence_status": "verified",
+      "host_evidence_status": "verified",
+      "host_models": ["host-model"],
+      "host_thinking": ["low", "max"],
+      "host_role_models": {"throughput": null, "balanced": "host-model", "deep": null},
+      "catalog_provenance": {"schema_version": "1.0", "receipt_id": "public-catalog-3", "evidence_kind": "catalog", "source": "catalog_observation", "observed_at": "2026-07-14T00:00:00Z", "ttl_seconds": 604800, "content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+      "host_provenance": {"schema_version": "1.0", "receipt_id": "public-host-3", "evidence_kind": "host_capability", "source": "host_tool_schema", "observed_at": "2026-07-14T00:00:00Z", "ttl_seconds": 604800, "content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+    },
+    "expected": {"model_role": "balanced", "model": "host-model", "thinking": "low", "topology": "single", "resolution": "resolved", "benefit": "none"}
+  }
+]

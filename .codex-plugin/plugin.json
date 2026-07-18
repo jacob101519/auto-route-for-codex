@@ -1,0 +1,21 @@
+{
+  "name": "auto-route-for-codex",
+  "version": "0.4.0-alpha.1",
+  "description": "Public-safe recommendation-only preview for Codex model routing.",
+  "author": {"name": "Jacob"},
+  "license": "Apache-2.0",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Auto Route for Codex",
+    "shortDescription": "Preview public-safe routing recommendations",
+    "longDescription": "Runs only when explicitly invoked as $auto-route-for-codex. This public preview is recommendation-only and does not transfer or archive tasks.",
+    "developerName": "Jacob",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": ["$auto-route-for-codex"],
+    "brandColor": "#10A37F",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "screenshots": []
+  }
+}
