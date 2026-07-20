@@ -1,7 +1,7 @@
 ---
 translation_of: docs/compatibility.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # 兼容性
@@ -47,7 +47,7 @@ Codex Desktop（Codex 桌面端）完整路径要求执行时同时满足：
 
 ## Version policy（版本政策）
 
-当前目标公开版本是 `0.5.0-alpha.1`。Alpha（早期测试）版本可能包含不兼容 contract change（契约变更）。Git tag（Git 标签）、Plugin manifest version（插件清单版本）、Release title（发行标题）和 Release asset name（发行制品名称）必须一致。
+当前目标公开版本是 `0.5.0-alpha.2`。Alpha（早期测试）版本可能包含不兼容 contract change（契约变更）。Git tag（Git 标签）、Plugin manifest version（插件清单版本）、Release title（发行标题）和 Release asset name（发行制品名称）必须一致。
 
 ## 兼容性不代表什么
 

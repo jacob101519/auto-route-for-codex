@@ -43,7 +43,7 @@ If any requirement is unavailable, stale, unknown, uncertain, or incompatible, i
 
 ## Version policy
 
-The current target public version is `0.5.0-alpha.1`. Alpha versions may make incompatible contract changes. Git tags, plugin manifest versions, release titles, and release asset names must match.
+The current target public version is `0.5.0-alpha.2`. Alpha versions may make incompatible contract changes. Git tags, plugin manifest versions, release titles, and release asset names must match.
 
 ## What compatibility does not mean
 

@@ -15,6 +15,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts" if (ROOT / "scripts" / "transfer_state.py").is_file() else ROOT
 sys.path.insert(0, str(SCRIPTS))

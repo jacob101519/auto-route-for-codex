@@ -28,7 +28,7 @@ Prerequisites:
 - access to the public Git repository.
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -111,12 +111,14 @@ See [Privacy and data flow](docs/privacy-and-data-flow.md), [Routing policy](doc
 
 ## Verify from a clean clone
 
+The checked-in dependency lock reproduces CI on Python 3.12 / Linux x86_64; use that platform for the commands below. Other platforms need a separately reviewed lock and must not reuse these wheel hashes.
+
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
-python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
-python3 skills/auto-route-for-codex/scripts/validate_contracts.py
-python3 scripts/build_release.py --output-dir dist
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 -B scripts/verify_public_repo.py --require-git-history
+python3 -B -m unittest discover -s skills/auto-route-for-codex/tests -v
+python3 -B skills/auto-route-for-codex/scripts/validate_contracts.py
+python3 -B scripts/build_release.py --output-dir dist
 ```
 
 Passing local checks validates the package contract and modeled state transitions. It does not prove real Codex Desktop side effects on every host version; real end-to-end behavior remains host-dependent. Consult [Compatibility](docs/compatibility.md).
@@ -134,7 +136,7 @@ Passing local checks validates the package contract and modeled state transition
 
 ## Project status
 
-`v0.5.0-alpha.1` is the first public alpha with capability-gated Codex Desktop task continuation. The API, host-capability contract, and package layout may change before a stable release. See [CHANGELOG.md](CHANGELOG.md) and [ROADMAP.md](ROADMAP.md).
+`v0.5.0-alpha.2` hardens public-history privacy, CI dependency integrity, and release provenance. The runtime routing contract is unchanged. See [CHANGELOG.md](CHANGELOG.md) and [ROADMAP.md](ROADMAP.md).
 
 ## Contributing and security
 

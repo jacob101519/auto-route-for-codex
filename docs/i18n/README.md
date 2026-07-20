@@ -9,7 +9,7 @@ The complete English documentation is in [`docs/`](../). The complete Simplified
 Every localized README uses:
 
 - `translation_of: README.md`;
-- `source_revision: docs-v0.5.0-alpha.1`;
-- `last_synced_version: 0.5.0-alpha.1`.
+- `source_revision: docs-v0.5.0-alpha.2`;
+- `last_synced_version: 0.5.0-alpha.2`.
 
 Translation changes must preserve commands, paths, JSON keys, model IDs, reasoning values, decision tuples, state tokens, and the ordered `fork -> send -> readback -> navigate -> archive` contract exactly.

@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import itertools
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -10,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_PATH = ROOT / "scripts" if (ROOT / "scripts" / "route_task.py").is_file() else ROOT
 sys.path.insert(0, str(SOURCE_PATH))

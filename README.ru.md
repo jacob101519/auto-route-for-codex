@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Auto Route for Codex — это плагин Codex с явным подключ�
 - доступ к публичному Git-репозиторию.
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ Timeout, несовпадение, неполный результат или н
 ## Проверка из чистого клона
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ python3 scripts/build_release.py --output-dir dist
 
 ## Состояние проекта
 
-`v0.5.0-alpha.1` — первая публичная альфа с продолжением задач Codex Desktop, защищённым проверкой возможностей. API и структура пакета могут измениться до выхода стабильной версии. См. [CHANGELOG.md](CHANGELOG.md) и [ROADMAP.md](ROADMAP.md).
+`v0.5.0-alpha.2` усиливает конфиденциальность публичной истории, целостность зависимостей CI и подтверждение происхождения релизов. Контракт маршрутизации во время выполнения не изменён. См. [CHANGELOG.md](CHANGELOG.md) и [ROADMAP.md](ROADMAP.md).
 
 ## Участие в проекте и безопасность
 

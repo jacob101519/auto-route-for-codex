@@ -1,7 +1,7 @@
 ---
 translation_of: docs/architecture.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # 架构

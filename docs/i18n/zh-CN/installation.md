@@ -1,7 +1,7 @@
 ---
 translation_of: docs/installation.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # 安装、升级、卸载与回退
@@ -11,7 +11,7 @@ last_synced_version: 0.5.0-alpha.1
 ## 安装固定 Release（发行版）
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -30,14 +30,14 @@ codex plugin list
 
 从 clean clone（干净克隆）运行：
 
-下面固定版本的 package（软件包）仅用于 repository verification（仓库验证）和 release check（发行检查），不是 Plugin runtime dependency（插件运行依赖）。
+下面带 hash lock（哈希锁定）的 Python 3.12 / Linux package（软件包）仅用于 repository verification（仓库验证）和 release check（发行检查），不是 Plugin runtime dependency（插件运行依赖）。
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
-python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
-python3 skills/auto-route-for-codex/scripts/validate_contracts.py
-python3 scripts/build_release.py --output-dir dist
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 -B scripts/verify_public_repo.py --require-git-history
+python3 -B -m unittest discover -s skills/auto-route-for-codex/tests -v
+python3 -B skills/auto-route-for-codex/scripts/validate_contracts.py
+python3 -B scripts/build_release.py --output-dir dist
 ```
 
 这些检查验证 deterministic policy（确定性政策）、schema（字段契约）、bounded current-setting reader（有限当前设置读取器）、reservation-backed transfer state（预留保护的转移状态）、privacy rule（隐私规则）、translation（翻译）和 release package（发行封装），不能替代真实 Codex Desktop E2E check（Codex 桌面端端到端检查）。

@@ -2,6 +2,21 @@
 
 All notable public changes are recorded here.
 
+## [0.5.0-alpha.2] - 2026-07-20
+
+### Security
+
+- replaced the personal email in all maintainer-controlled public branch and tag history with the GitHub `noreply` identity;
+- added full reachable-history scanning for private email, personal paths, credentials, current and historical filenames, commit/tag identities and messages, and strict UTF-8 historical blobs;
+- pinned the complete CI dependency closure with SHA-256 hashes and disabled checkout credential persistence;
+- added annotated-tag, clean-worktree, full-history, exact-HEAD, protected-`main` ancestry, exact-CI, and immutable-release provenance gates;
+- added a least-privilege tag-triggered release workflow with deterministic rebuild checks, artifact attestations, and a separate administration-read-only immutable-setting preflight token;
+- added Dependabot configuration and repository hygiene exclusions for generated or runtime state.
+
+### Compatibility
+
+- the runtime routing and task-continuation contract is unchanged from `0.5.0-alpha.1`.
+
 ## [0.5.0-alpha.1] - 2026-07-20
 
 ### Added

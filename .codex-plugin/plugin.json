@@ -1,6 +1,6 @@
 {
   "name": "auto-route-for-codex",
-  "version": "0.5.0-alpha.1",
+  "version": "0.5.0-alpha.2",
   "description": "Capability-gated model routing and safe task continuation for Codex Desktop.",
   "author": {"name": "Jacob"},
   "license": "Apache-2.0",

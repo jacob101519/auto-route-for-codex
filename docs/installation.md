@@ -7,7 +7,7 @@ English is the authoritative source for this document.
 ## Install a pinned release
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -26,14 +26,14 @@ The installed selector should be `auto-route-for-codex@jacob101519`. Discovery p
 
 From a clean clone:
 
-The pinned packages below are required only for repository verification and release checks. They are not plugin runtime dependencies.
+The hash-locked Python 3.12 / Linux packages below are required only for repository verification and release checks. They are not plugin runtime dependencies.
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
-python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
-python3 skills/auto-route-for-codex/scripts/validate_contracts.py
-python3 scripts/build_release.py --output-dir dist
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 -B scripts/verify_public_repo.py --require-git-history
+python3 -B -m unittest discover -s skills/auto-route-for-codex/tests -v
+python3 -B skills/auto-route-for-codex/scripts/validate_contracts.py
+python3 -B scripts/build_release.py --output-dir dist
 ```
 
 These checks validate deterministic policy, schemas, the bounded current-setting reader, reservation-backed transfer states, privacy rules, translations, and release packaging. They do not replace a real Codex Desktop end-to-end check.

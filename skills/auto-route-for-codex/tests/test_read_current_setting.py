@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts" if (ROOT / "scripts" / "read_current_setting.py").is_file() else ROOT
 SCRIPT = SCRIPTS / "read_current_setting.py"

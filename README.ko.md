@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Model choice(모델 선택)와 reasoning effort(추론 강도)는 서로 다른 
 - 공개 Git repository(Git 저장소)에 대한 접근 권한.
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ timeout, mismatch, 불완전한 결과 또는 모호한 side effect는 `uncertai
 ## 깨끗한 Clone에서 검증하기
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ python3 scripts/build_release.py --output-dir dist
 
 ## 프로젝트 상태
 
-`v0.5.0-alpha.1`은 capability gate로 보호되는 Codex Desktop task continuation을 포함한 첫 공개 Alpha 버전입니다. stable release(안정 버전) 이전에는 API와 package layout(패키지 구성)이 변경될 수 있습니다. [CHANGELOG.md](CHANGELOG.md)와 [ROADMAP.md](ROADMAP.md)를 참조하세요.
+`v0.5.0-alpha.2`는 공개 기록의 개인정보 보호, CI 종속성 무결성, 릴리스 출처 증명을 강화합니다. 런타임 라우팅 계약은 변경되지 않았습니다. [CHANGELOG.md](CHANGELOG.md)와 [ROADMAP.md](ROADMAP.md)를 참조하세요.
 
 ## 기여 및 보안
 

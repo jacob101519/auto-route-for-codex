@@ -66,9 +66,9 @@ Do not retry by creating another destination. A timeout after a possible side ef
 Run:
 
 ```sh
-python3 scripts/verify_public_repo.py
-python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
-python3 skills/auto-route-for-codex/scripts/validate_contracts.py
+python3 -B scripts/verify_public_repo.py --require-git-history
+python3 -B -m unittest discover -s skills/auto-route-for-codex/tests -v
+python3 -B skills/auto-route-for-codex/scripts/validate_contracts.py
 ```
 
 Fix the first reported invariant. Do not bypass translation, privacy, manifest, schema, or transfer-state checks for a release.

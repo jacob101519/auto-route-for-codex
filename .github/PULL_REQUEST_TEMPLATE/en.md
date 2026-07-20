@@ -13,9 +13,9 @@ Describe the user-visible change and the problem it solves.
 
 ## Verification
 
-- [ ] `python3 scripts/verify_public_repo.py`
-- [ ] `python3 -m unittest discover -s skills/auto-route-for-codex/tests -v`
-- [ ] `python3 skills/auto-route-for-codex/scripts/validate_contracts.py`
-- [ ] `python3 scripts/build_release.py --output-dir dist`
+- [ ] `python3 -B scripts/verify_public_repo.py`
+- [ ] `python3 -B -m unittest discover -s skills/auto-route-for-codex/tests -v`
+- [ ] `python3 -B skills/auto-route-for-codex/scripts/validate_contracts.py`
+- [ ] `python3 -B scripts/build_release.py --output-dir dist`
 
 List any additional evidence and known limitations.

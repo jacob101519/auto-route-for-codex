@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Herkese açık sözleşme altı kurala uyar:
 - herkese açık Git deposuna erişim.
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ Bilinçli olarak hariç tutulanlar:
 ## Temiz bir klondan doğrulama
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ Yerel kontrollerin geçmesi depo sözleşmesini doğrular. Bu, her Codex host s�
 
 ## Proje durumu
 
-`v0.5.0-alpha.1`, capability-gated Codex Desktop task continuation içeren ilk genel alfa sürümüdür. API ve paket düzeni kararlı bir sürümden önce değişebilir. [CHANGELOG.md](CHANGELOG.md) ve [ROADMAP.md](ROADMAP.md) belgelerine bakın.
+`v0.5.0-alpha.2`, genel geçmiş gizliliğini, CI bağımlılık bütünlüğünü ve sürüm kaynağı kanıtını güçlendirir. Çalışma zamanı yönlendirme sözleşmesi değişmemiştir. [CHANGELOG.md](CHANGELOG.md) ve [ROADMAP.md](ROADMAP.md) belgelerine bakın.
 
 ## Katkı ve güvenlik
 

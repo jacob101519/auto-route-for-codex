@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Hợp đồng công khai tuân theo sáu quy tắc:
 - quyền truy cập vào kho Git công khai.
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ Xem [Quyền riêng tư và luồng dữ liệu](docs/privacy-and-data-flow.md),
 ## Xác minh từ một bản sao sạch
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ Các bước kiểm tra cục bộ vượt qua sẽ xác thực hợp đồng c�
 
 ## Trạng thái dự án
 
-`v0.5.0-alpha.1` là alpha công khai đầu tiên có capability-gated Codex Desktop task continuation. API và bố cục gói có thể thay đổi trước khi phát hành phiên bản ổn định. Xem [CHANGELOG.md](CHANGELOG.md) và [ROADMAP.md](ROADMAP.md).
+`v0.5.0-alpha.2` tăng cường quyền riêng tư của lịch sử công khai, tính toàn vẹn của dependency CI và bằng chứng nguồn gốc bản phát hành. Hợp đồng định tuyến runtime không thay đổi. Xem [CHANGELOG.md](CHANGELOG.md) và [ROADMAP.md](ROADMAP.md).
 
 ## Đóng góp và bảo mật
 

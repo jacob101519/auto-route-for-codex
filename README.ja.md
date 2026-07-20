@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Model choice（モデル選択）と reasoning effort（推論強度）は別々
 - 公開 Git repository（Git リポジトリ）へのアクセス。
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ timeout（タイムアウト）、不一致、不完全な結果、または曖�
 ## クリーンな Clone から検証する
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ python3 scripts/build_release.py --output-dir dist
 
 ## プロジェクトの状況
 
-`v0.5.0-alpha.1` は capability gate で保護された Codex Desktop task continuation を含む最初の公開 Alpha（アルファ）版です。stable release（安定版）の公開前に、API と package layout（パッケージ構成）が変更される可能性があります。[CHANGELOG.md](CHANGELOG.md) と [ROADMAP.md](ROADMAP.md) を参照してください。
+`v0.5.0-alpha.2` は公開履歴のプライバシー、CI 依存関係の完全性、リリース来歴を強化します。ランタイムのルーティング契約は変更されていません。[CHANGELOG.md](CHANGELOG.md) と [ROADMAP.md](ROADMAP.md) を参照してください。
 
 ## コントリビューションとセキュリティ
 

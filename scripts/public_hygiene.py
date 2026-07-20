@@ -32,6 +32,49 @@ SECRET_PATTERNS = (
 UUID_PATTERN = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
 )
+EMAIL_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9._%+-])"
+    r"[A-Za-z0-9._%+-]+@(?:localhost|"
+    r"(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+"
+    r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)"
+    r"(?![A-Za-z0-9._%+-])",
+    re.IGNORECASE,
+)
+GITHUB_NOREPLY_PATTERN = re.compile(
+    r"^(?:noreply@github\.com|(?:[0-9]+\+)?"
+    r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\[bot\])?"
+    r"@users\.noreply\.github\.com)$",
+    re.IGNORECASE,
+)
+EXAMPLE_EMAIL_PATTERN = re.compile(
+    r"^[^@\s]+@(?:(?:[^@\s.]+\.)*example\.(?:com|net|org)|example|"
+    r"(?:[^@\s.]+\.)*(?:test|invalid|localhost))$",
+    re.IGNORECASE,
+)
+PUBLIC_SSH_MACHINE_ACCOUNTS = frozenset({
+    "git" + "@bitbucket.org",
+    "git" + "@github.com",
+    "git" + "@gitlab.com",
+    "git" + "@ssh.github.com",
+})
+MACOS_HOME_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9.\]])/" + r"Users" + r"/[A-Za-z0-9._-]+"
+    r"(?:/|(?=$)|(?=[\s\"'`),;:\]}]))",
+    re.IGNORECASE,
+)
+LINUX_HOME_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9.\]])/" + r"home" + r"/[A-Za-z0-9._-]+"
+    r"(?:/|(?=$)|(?=[\s\"'`),;:\]}]))"
+)
+WINDOWS_HOME_PATTERN = re.compile(
+    r"\b[A-Za-z]:[\\/]" + r"Users" + r"[\\/][^\\/\s]+"
+    r"(?:[\\/]|(?=$)|(?=[\s\"'`),;:\]}]))",
+    re.IGNORECASE,
+)
+URL_USERINFO_PATTERN = re.compile(
+    r"\b[a-z][a-z0-9+.-]*://[^/@\s:]+:[^/@\s]+@",
+    re.IGNORECASE,
+)
 PACKAGE_ALLOWLIST = frozenset({
     ".codex-plugin/plugin.json",
     "LICENSE",
@@ -61,9 +104,31 @@ def find_secret(text: str) -> str | None:
     return None
 
 
+def is_allowed_public_email(value: str) -> bool:
+    return bool(
+        GITHUB_NOREPLY_PATTERN.fullmatch(value)
+        or EXAMPLE_EMAIL_PATTERN.fullmatch(value)
+    )
+
+
 def find_private_identifier(text: str) -> str | None:
-    if "/" + "Users" + "/" in text:
+    if MACOS_HOME_PATTERN.search(text):
         return "macos_home_path"
+    if LINUX_HOME_PATTERN.search(text):
+        return "linux_home_path"
+    if WINDOWS_HOME_PATTERN.search(text):
+        return "windows_home_path"
+    if URL_USERINFO_PATTERN.search(text):
+        return "url_userinfo"
+    for match in EMAIL_PATTERN.finditer(text):
+        email = match.group(0)
+        if (
+            email.casefold() in PUBLIC_SSH_MACHINE_ACCOUNTS
+            and text[match.end():match.end() + 1] == ":"
+        ):
+            continue
+        if not is_allowed_public_email(email):
+            return "private_email"
     if UUID_PATTERN.search(text):
         return "uuid"
     if "codex-" + "local-tools" in text:
@@ -87,8 +152,34 @@ def assert_scanner_self_test() -> None:
         raise ValueError("secret_scanner_self_test_failed")
     private_values = (
         "/" + "Users/example/private",
+        "/" + "Users/example",
+        "/" + "home/example/private",
+        "/" + "home/example",
+        "C:" + "\\Users\\example\\private",
+        "C:" + "\\Users\\example",
+        "https://private-user:private-pass" + "@example.com/path",
+        "private.person" + "@gmail.com",
+        "private.person" + "@example.xn--p1ai",
+        "git" + "@github.com",
         "019f0000" + "-abcd-7def-8abc-0123456789ab",
         "codex-" + "local-tools",
     )
     if any(find_private_identifier(value) is None for value in private_values):
         raise ValueError("private_identifier_scanner_self_test_failed")
+    public_values = (
+        "259367310+jacob101519" + "@users.noreply.github.com",
+        "noreply" + "@github.com",
+        "maintainer" + "@example.com",
+        "private.person" + "@localhost",
+        "private.person" + "@sample.test",
+        "private.person" + "@mail.example.com",
+        "private.person" + "@bar.invalid",
+        "git" + "@github.com:jacob101519/example.git",
+        "git" + "@ssh.github.com:443/jacob101519/example.git",
+        "https://example.com/home/alice",
+        "https://example.com./home/alice",
+        "https://[::1]/Users/alice",
+        "auto-route-for-codex" + "@jacob101519",
+    )
+    if any(find_private_identifier(value) is not None for value in public_values):
+        raise ValueError("public_email_allowlist_self_test_failed")

@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Auto Route for Codex เป็นปลั๊กอิน Codex ที่ผู�
 - สิทธิ์เข้าถึง Git repository สาธารณะ
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ timeout, mismatch, ผลลัพธ์ไม่สมบูรณ์ หรื
 ## ตรวจสอบจาก clone ที่สะอาด
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ python3 scripts/build_release.py --output-dir dist
 
 ## สถานะโปรเจกต์
 
-`v0.5.0-alpha.1` เป็นอัลฟาสาธารณะรุ่นแรกที่มี Codex Desktop task continuation แบบ capability gate API และโครงสร้างแพ็กเกจอาจเปลี่ยนแปลงก่อนการออกเวอร์ชันเสถียร ดู [CHANGELOG.md](CHANGELOG.md) และ [ROADMAP.md](ROADMAP.md)
+`v0.5.0-alpha.2` เพิ่มความแข็งแกร่งให้ความเป็นส่วนตัวของประวัติสาธารณะ ความถูกต้องของ dependency ใน CI และหลักฐานที่มาของรีลีส โดยไม่เปลี่ยนสัญญาการกำหนดเส้นทางขณะรัน ดู [CHANGELOG.md](CHANGELOG.md) และ [ROADMAP.md](ROADMAP.md)
 
 ## การมีส่วนร่วมและความปลอดภัย
 

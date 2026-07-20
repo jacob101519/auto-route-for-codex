@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import stat
+import subprocess
 import tempfile
 import zipfile
 from pathlib import Path
@@ -21,7 +22,7 @@ from public_hygiene import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.5.0-alpha.1"
+VERSION = "0.5.0-alpha.2"
 ARCHIVE_NAME = f"auto-route-for-codex-{VERSION}.zip"
 CHECKSUM_NAME = "SHA256SUMS"
 INCLUDE_ROOTS = (
@@ -40,6 +41,64 @@ FORBIDDEN_SUFFIXES = {".pyc", ".log", ".sqlite", ".sqlite3", ".db", ".pid", ".lo
 
 def fail(reason: str) -> None:
     raise SystemExit(f"release build failed: {reason}")
+
+
+def run_git(arguments: list[str]) -> str:
+    try:
+        result = subprocess.run(
+            ["git", *arguments],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        fail(f"release_git_unavailable:{arguments[0]}")
+    if result.returncode != 0:
+        fail(f"release_git_failed:{arguments[0]}")
+    return result.stdout.strip()
+
+
+def verify_release_provenance(expected_tag: str | None) -> None:
+    if expected_tag is None:
+        return
+    if expected_tag != f"v{VERSION}":
+        fail("release_tag_version_mismatch")
+    if not (ROOT / ".git").exists():
+        fail("release_git_repository_required")
+    if run_git(["rev-parse", "--is-shallow-repository"]) != "false":
+        fail("release_repository_shallow")
+    tag_ref = f"refs/tags/{expected_tag}"
+    if run_git(["cat-file", "-t", tag_ref]) != "tag":
+        fail("release_tag_not_annotated")
+    tag_commit = run_git(["rev-parse", f"{tag_ref}^{{commit}}"])
+    head_commit = run_git(["rev-parse", "HEAD"])
+    if tag_commit != head_commit:
+        fail("release_tag_not_at_head")
+    try:
+        ancestry = subprocess.run(
+            [
+                "git",
+                "merge-base",
+                "--is-ancestor",
+                tag_commit,
+                "refs/remotes/origin/main",
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        fail("release_main_ancestry_unavailable")
+    if ancestry.returncode == 1:
+        fail("release_tag_not_on_main")
+    if ancestry.returncode != 0:
+        fail("release_main_ancestry_unavailable")
+    if run_git(["status", "--porcelain=v1", "--untracked-files=all"]):
+        fail("release_worktree_dirty")
 
 
 def assert_release_hygiene() -> None:
@@ -220,12 +279,14 @@ def atomic_replace(source: Path, destination: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--expected-tag")
     args = parser.parse_args()
     try:
         assert_scanner_self_test()
     except ValueError as exc:
         fail(str(exc))
     verify_version()
+    verify_release_provenance(args.expected_tag)
     assert_release_hygiene()
     sources = source_files()
     output_dir = secure_output_dir(args.output_dir)

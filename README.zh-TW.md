@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Model choice（模型選擇）和 reasoning effort（推理強度）是兩個不
 - 可以存取公開 Git repository（Git 儲存庫）。
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ Timeout（逾時）、mismatch（不一致）、incomplete result（不完整結
 ## 從乾淨的 Clone 驗證
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ python3 scripts/build_release.py --output-dir dist
 
 ## 專案狀態
 
-`v0.5.0-alpha.1` 是第一個提供 capability-gated Codex Desktop task continuation（受能力門檻保護的桌面端任務繼續）的公開 Alpha（早期測試）版本。在 stable release（穩定版本）推出之前，API 和 package layout（套件結構）可能會變更。請參閱 [CHANGELOG.md](CHANGELOG.md) 和 [ROADMAP.md](ROADMAP.md)。
+`v0.5.0-alpha.2` 強化 public-history privacy（公開歷史隱私）、CI dependency integrity（持續整合依賴完整性）與 Release provenance（發布來源證明）；runtime routing contract（執行時路由契約）維持不變。請參閱 [CHANGELOG.md](CHANGELOG.md) 和 [ROADMAP.md](ROADMAP.md)。
 
 ## 貢獻與安全性
 

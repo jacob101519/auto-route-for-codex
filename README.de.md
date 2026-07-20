@@ -1,7 +1,7 @@
 ---
 translation_of: README.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # Auto Route for Codex
@@ -34,7 +34,7 @@ Voraussetzungen:
 - Zugriff auf das öffentliche Git-Repository.
 
 ```sh
-codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1
+codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.2
 codex plugin add auto-route-for-codex@jacob101519
 ```
 
@@ -117,8 +117,8 @@ Siehe [Datenschutz und Datenfluss](docs/privacy-and-data-flow.md), [Routing-Rich
 ## Überprüfung aus einem sauberen Klon
 
 ```sh
-python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
-python3 scripts/verify_public_repo.py
+python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/requirements-ci.txt
+python3 scripts/verify_public_repo.py --require-git-history
 python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
 python3 skills/auto-route-for-codex/scripts/validate_contracts.py
 python3 scripts/build_release.py --output-dir dist
@@ -139,7 +139,7 @@ Erfolgreiche lokale Prüfungen bestätigen den Repository-Vertrag. Sie beweisen 
 
 ## Projektstatus
 
-`v0.5.0-alpha.1` ist die erste öffentliche Alpha-Version mit fähigkeitsgesteuerter Codex-Desktop-Aufgabenfortsetzung. Die API und die Paketstruktur können sich vor einer stabilen Version ändern. Siehe [CHANGELOG.md](CHANGELOG.md) und [ROADMAP.md](ROADMAP.md).
+`v0.5.0-alpha.2` stärkt den Datenschutz der öffentlichen Historie, die Integrität der CI-Abhängigkeiten und die Herkunftsnachweise für Releases. Der Laufzeit-Routingvertrag bleibt unverändert. Siehe [CHANGELOG.md](CHANGELOG.md) und [ROADMAP.md](ROADMAP.md).
 
 ## Beiträge und Sicherheit
 

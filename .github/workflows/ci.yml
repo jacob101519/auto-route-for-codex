@@ -11,18 +11,27 @@ permissions:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.12"
       - name: Install validator dependencies
-        run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
+        run: >-
+          python3 -m pip install
+          --disable-pip-version-check
+          --only-binary=:all:
+          --require-hashes
+          -r .github/requirements-ci.txt
       - name: Fetch pinned official validators
         run: |
           curl --proto '=https' --tlsv1.2 -fsSLo /tmp/openai-quick-validate.py https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.system/skill-creator/scripts/quick_validate.py
@@ -34,7 +43,7 @@ jobs:
       - name: Run official Plugin validator
         run: python3 /tmp/openai-validate-plugin.py .
       - name: Verify public repository
-        run: python3 scripts/verify_public_repo.py
+        run: python3 scripts/verify_public_repo.py --require-git-history
       - name: Run release-pipeline security tests
         run: python3 -m unittest discover -s scripts/tests -v
       - name: Run router unit tests
@@ -44,10 +53,10 @@ jobs:
       - name: Build deterministic release artifacts
         run: python3 scripts/build_release.py --output-dir dist
       - name: Upload release candidates
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: auto-route-for-codex-${{ github.sha }}
           path: |
-            dist/auto-route-for-codex-0.5.0-alpha.1.zip
+            dist/auto-route-for-codex-0.5.0-alpha.2.zip
             dist/SHA256SUMS
           if-no-files-found: error

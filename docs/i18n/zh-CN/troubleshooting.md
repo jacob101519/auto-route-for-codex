@@ -1,7 +1,7 @@
 ---
 translation_of: docs/troubleshooting.md
-source_revision: docs-v0.5.0-alpha.1
-last_synced_version: 0.5.0-alpha.1
+source_revision: docs-v0.5.0-alpha.2
+last_synced_version: 0.5.0-alpha.2
 ---
 
 # 故障排查
@@ -68,9 +68,9 @@ Evidence（证据）过期后不得再次 reserve（预留）。如果 immutable
 ## Repository verification（仓库验证）失败
 
 ```sh
-python3 scripts/verify_public_repo.py
-python3 -m unittest discover -s skills/auto-route-for-codex/tests -v
-python3 skills/auto-route-for-codex/scripts/validate_contracts.py
+python3 -B scripts/verify_public_repo.py --require-git-history
+python3 -B -m unittest discover -s skills/auto-route-for-codex/tests -v
+python3 -B skills/auto-route-for-codex/scripts/validate_contracts.py
 ```
 
 先修复第一个 invariant（不变量）错误。Release（发行）时不得绕过 translation（翻译）、privacy（隐私）、manifest（清单）、schema（字段契约）或 transfer-state check（转移状态检查）。
