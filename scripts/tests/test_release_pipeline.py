@@ -191,6 +191,36 @@ class ReleasePipelineSecurityTests(unittest.TestCase):
         self.assertNotEqual(built.returncode, 0)
         self.assertIn("private_email", built.stderr + built.stdout)
 
+    def test_github_support_email_is_allowed_in_public_text(self) -> None:
+        skill = self.root / "skills" / "auto-route-for-codex" / "SKILL.md"
+        original = skill.read_text(encoding="ascii")
+        skill.write_text(
+            original + "\nSigned-off-by: GitHub <" + "support" + "@github.com>\n",
+            encoding="ascii",
+        )
+
+        verified = self.run_script("scripts/verify_public_repo.py")
+        built = self.run_script(
+            "scripts/build_release.py",
+            "--output-dir",
+            str(Path(self.temporary.name) / "github-support-email-release"),
+        )
+
+        self.assertEqual(verified.returncode, 0, verified.stderr + verified.stdout)
+        self.assertEqual(built.returncode, 0, built.stderr + built.stdout)
+
+    def test_github_support_email_is_rejected_as_commit_identity(self) -> None:
+        self.initialize_git("support" + "@github.com", name="support")
+
+        verified = self.run_script(
+            "scripts/verify_public_repo.py",
+            "--require-git-history",
+        )
+
+        self.assertNotEqual(verified.returncode, 0)
+        self.assertIn("git_commit_author", verified.stderr + verified.stdout)
+        self.assertIn("identity_not_public", verified.stderr + verified.stdout)
+
     def test_private_current_filename_is_rejected(self) -> None:
         private_path = self.root / ("private.person" + "@gmail.com.txt")
         private_path.write_text("synthetic public content\n", encoding="ascii")

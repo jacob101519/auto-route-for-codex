@@ -2,6 +2,12 @@
 
 All notable public changes are recorded here.
 
+## [Unreleased]
+
+### Security
+
+- allow the exact public GitHub service address `support@github.com` in scanned text while continuing to reject it as a commit identity, preventing Dependabot signatures from weakening or blocking full-history privacy verification.
+
 ## [0.5.0-alpha.2] - 2026-07-20
 
 ### Security

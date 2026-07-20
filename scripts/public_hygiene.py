@@ -57,6 +57,9 @@ PUBLIC_SSH_MACHINE_ACCOUNTS = frozenset({
     "git" + "@gitlab.com",
     "git" + "@ssh.github.com",
 })
+PUBLIC_SERVICE_EMAILS = frozenset({
+    "support" + "@github.com",
+})
 MACOS_HOME_PATTERN = re.compile(
     r"(?<![A-Za-z0-9.\]])/" + r"Users" + r"/[A-Za-z0-9._-]+"
     r"(?:/|(?=$)|(?=[\s\"'`),;:\]}]))",
@@ -111,6 +114,13 @@ def is_allowed_public_email(value: str) -> bool:
     )
 
 
+def is_allowed_public_text_email(value: str) -> bool:
+    return bool(
+        is_allowed_public_email(value)
+        or value.casefold() in PUBLIC_SERVICE_EMAILS
+    )
+
+
 def find_private_identifier(text: str) -> str | None:
     if MACOS_HOME_PATTERN.search(text):
         return "macos_home_path"
@@ -127,7 +137,7 @@ def find_private_identifier(text: str) -> str | None:
             and text[match.end():match.end() + 1] == ":"
         ):
             continue
-        if not is_allowed_public_email(email):
+        if not is_allowed_public_text_email(email):
             return "private_email"
     if UUID_PATTERN.search(text):
         return "uuid"
@@ -169,6 +179,7 @@ def assert_scanner_self_test() -> None:
     public_values = (
         "259367310+jacob101519" + "@users.noreply.github.com",
         "noreply" + "@github.com",
+        "support" + "@github.com",
         "maintainer" + "@example.com",
         "private.person" + "@localhost",
         "private.person" + "@sample.test",
