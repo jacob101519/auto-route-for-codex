@@ -6,7 +6,7 @@ We are committed to a respectful, inclusive, and technically rigorous community.
 
 - Be constructive and specific.
 - Critique ideas and evidence, not people.
-- Respect privacy and do not post credentials, private prompts, or personal data.
+- Respect privacy and do not post credentials, private prompts, personal data, raw reservation leases, receipts, or reservation markers.
 - Welcome questions from people with different levels of experience.
 - Disclose conflicts of interest that affect technical recommendations.
 

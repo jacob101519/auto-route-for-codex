@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jacob101519/auto-route-for-codex/blob/main/skills/auto-route-for-codex/schemas/transfer-reservation.schema.json",
+  "title": "Auto Route for Codex Transfer Reservation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_binding_sha256", "transfer_id", "authorization_binding", "prior_state_chain_sha256", "event", "destination_thread_id", "prompt_sha256", "recommended_model", "recommended_thinking", "lease_sha256"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "source_binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "transfer_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "authorization_binding": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "prior_state_chain_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "event": {"enum": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed"]},
+    "destination_thread_id": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "prompt_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "recommended_model": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"},
+    "recommended_thinking": {"type": ["string", "null"], "enum": [null, "none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+    "lease_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "event": {"const": "fork_created"},
+        "destination_thread_id": {"const": null},
+        "prompt_sha256": {"const": null},
+        "recommended_model": {"const": null},
+        "recommended_thinking": {"const": null}
+      }
+    },
+    {
+      "properties": {
+        "event": {"const": "prompt_delivery_confirmed"},
+        "destination_thread_id": {"type": "string"},
+        "prompt_sha256": {"type": "string"},
+        "recommended_model": {"type": "string"},
+        "recommended_thinking": {"type": "string"}
+      }
+    },
+    {
+      "properties": {
+        "event": {"const": "destination_readback_confirmed"},
+        "destination_thread_id": {"type": "string"},
+        "prompt_sha256": {"type": "string"},
+        "recommended_model": {"const": null},
+        "recommended_thinking": {"const": null}
+      }
+    },
+    {
+      "properties": {
+        "event": {"enum": ["navigation_confirmed", "source_archive_confirmed"]},
+        "destination_thread_id": {"type": "string"},
+        "prompt_sha256": {"const": null},
+        "recommended_model": {"const": null},
+        "recommended_thinking": {"const": null}
+      }
+    }
+  ]
+}

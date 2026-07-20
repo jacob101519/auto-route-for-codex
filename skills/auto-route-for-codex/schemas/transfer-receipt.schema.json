@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jacob101519/auto-route-for-codex/blob/main/skills/auto-route-for-codex/schemas/transfer-receipt.schema.json",
+  "title": "Auto Route for Codex Transfer Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_binding_sha256", "transfer_id", "state", "source_disposition", "prompt_sha256", "router_input_sha256", "route_authorization", "authorization_binding", "recommended_model", "recommended_thinking", "destination_thread_id", "archive_authorized", "confirmed_events", "pending_reservation", "state_chain_sha256"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "source_binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "transfer_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "state": {"enum": ["planned", "fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed", "uncertain"]},
+    "source_disposition": {"const": "archive_after_continuation_ready"},
+    "prompt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "router_input_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "route_authorization": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authorization_binding": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "recommended_model": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"},
+    "recommended_thinking": {"enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+    "destination_thread_id": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "archive_authorized": {"type": "boolean"},
+    "confirmed_events": {"type": "array", "items": {"enum": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed"]}, "uniqueItems": true},
+    "pending_reservation": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["event", "reservation_sha256", "lease_sha256", "prior_state_chain_sha256"],
+          "properties": {
+            "event": {"enum": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed"]},
+            "reservation_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "lease_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "prior_state_chain_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "state_chain_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "uncertainty_reason": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "state": {"const": "planned"},
+        "destination_thread_id": {"const": null},
+        "archive_authorized": {"const": false},
+        "confirmed_events": {"const": []},
+        "pending_reservation": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "properties": {"event": {"const": "fork_created"}}}
+          ]
+        }
+      },
+      "not": {"required": ["uncertainty_reason"]}
+    },
+    {
+      "properties": {
+        "state": {"const": "fork_created"},
+        "destination_thread_id": {"type": "string"},
+        "archive_authorized": {"const": false},
+        "confirmed_events": {"const": ["fork_created"]},
+        "pending_reservation": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "properties": {"event": {"const": "prompt_delivery_confirmed"}}}
+          ]
+        }
+      },
+      "not": {"required": ["uncertainty_reason"]}
+    },
+    {
+      "properties": {
+        "state": {"const": "prompt_delivery_confirmed"},
+        "destination_thread_id": {"type": "string"},
+        "archive_authorized": {"const": false},
+        "confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed"]},
+        "pending_reservation": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "properties": {"event": {"const": "destination_readback_confirmed"}}}
+          ]
+        }
+      },
+      "not": {"required": ["uncertainty_reason"]}
+    },
+    {
+      "properties": {
+        "state": {"const": "destination_readback_confirmed"},
+        "destination_thread_id": {"type": "string"},
+        "archive_authorized": {"const": false},
+        "confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed"]},
+        "pending_reservation": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "properties": {"event": {"const": "navigation_confirmed"}}}
+          ]
+        }
+      },
+      "not": {"required": ["uncertainty_reason"]}
+    },
+    {
+      "properties": {
+        "state": {"const": "navigation_confirmed"},
+        "destination_thread_id": {"type": "string"},
+        "archive_authorized": {"const": true},
+        "confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed"]},
+        "pending_reservation": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "properties": {"event": {"const": "source_archive_confirmed"}}}
+          ]
+        }
+      },
+      "not": {"required": ["uncertainty_reason"]}
+    },
+    {
+      "properties": {
+        "state": {"const": "source_archive_confirmed"},
+        "destination_thread_id": {"type": "string"},
+        "archive_authorized": {"const": false},
+        "confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed"]},
+        "pending_reservation": {"const": null}
+      },
+      "not": {"required": ["uncertainty_reason"]}
+    },
+    {
+      "required": ["uncertainty_reason"],
+      "properties": {
+        "state": {"const": "uncertain"},
+        "archive_authorized": {"const": false},
+        "confirmed_events": {
+          "oneOf": [
+            {"const": []},
+            {"const": ["fork_created"]},
+            {"const": ["fork_created", "prompt_delivery_confirmed"]},
+            {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed"]},
+            {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed"]},
+            {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed"]}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"confirmed_events": {"const": []}}},
+          "then": {"properties": {"pending_reservation": {"oneOf": [{"type": "null"}, {"type": "object", "properties": {"event": {"const": "fork_created"}}}]}}}
+        },
+        {
+          "if": {"properties": {"confirmed_events": {"const": ["fork_created"]}}},
+          "then": {"properties": {"pending_reservation": {"oneOf": [{"type": "null"}, {"type": "object", "properties": {"event": {"const": "prompt_delivery_confirmed"}}}]}}}
+        },
+        {
+          "if": {"properties": {"confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed"]}}},
+          "then": {"properties": {"pending_reservation": {"oneOf": [{"type": "null"}, {"type": "object", "properties": {"event": {"const": "destination_readback_confirmed"}}}]}}}
+        },
+        {
+          "if": {"properties": {"confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed"]}}},
+          "then": {"properties": {"pending_reservation": {"oneOf": [{"type": "null"}, {"type": "object", "properties": {"event": {"const": "navigation_confirmed"}}}]}}}
+        },
+        {
+          "if": {"properties": {"confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed"]}}},
+          "then": {"properties": {"pending_reservation": {"oneOf": [{"type": "null"}, {"type": "object", "properties": {"event": {"const": "source_archive_confirmed"}}}]}}}
+        },
+        {
+          "if": {"properties": {"confirmed_events": {"const": ["fork_created", "prompt_delivery_confirmed", "destination_readback_confirmed", "navigation_confirmed", "source_archive_confirmed"]}}},
+          "then": {"properties": {"pending_reservation": {"const": null}}}
+        }
+      ]
+    }
+  ]
+}

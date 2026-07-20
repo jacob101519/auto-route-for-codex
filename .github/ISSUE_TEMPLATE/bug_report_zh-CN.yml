@@ -5,12 +5,12 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: 请勿提交 credential（凭据）、私有任务正文、本机路径或 session identifier（任务标识）。
+      value: 请勿提交 credential（凭据）、私有任务正文、本机路径、session identifier（任务标识）、receipt（回执）、reservation marker（预留标记）或原始 reservation_lease（预留租约）。
   - type: input
     id: version
     attributes:
       label: Version（版本）
-      placeholder: 0.4.0-alpha.1
+      placeholder: 0.5.0-alpha.1
     validations:
       required: true
   - type: dropdown

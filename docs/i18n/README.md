@@ -1,26 +1,15 @@
-# Translation coverage
+# Documentation languages
 
-English is the authoritative source. A localized README translates every section of `README.md`; it is not a summary. Only Simplified Chinese currently includes a complete translation of the deep documentation under `docs/`.
+English is the authoritative source for Auto Route for Codex documentation.
 
-| Language | Locale | README | Deep documentation | Entry point |
-|---|---|---:|---:|---|
-| English | `en` | Complete, authoritative | Complete, authoritative | [README.md](../../README.md) |
-| Português (Brasil) | `pt-BR` | Complete | English fallback | [README.pt-BR.md](../../README.pt-BR.md) |
-| 简体中文 | `zh-CN` | Complete | Complete | [README.zh-CN.md](../../README.zh-CN.md) |
-| 繁體中文 | `zh-TW` | Complete | English fallback | [README.zh-TW.md](../../README.zh-TW.md) |
-| 日本語 | `ja` | Complete | English fallback | [README.ja.md](../../README.ja.md) |
-| 한국어 | `ko` | Complete | English fallback | [README.ko.md](../../README.ko.md) |
-| Türkçe | `tr` | Complete | English fallback | [README.tr.md](../../README.tr.md) |
-| Русский | `ru` | Complete | English fallback | [README.ru.md](../../README.ru.md) |
-| Tiếng Việt | `vi` | Complete | English fallback | [README.vi.md](../../README.vi.md) |
-| ไทย | `th` | Complete | English fallback | [README.th.md](../../README.th.md) |
-| Deutsch | `de` | Complete | English fallback | [README.de.md](../../README.de.md) |
-| Español | `es` | Complete | English fallback | [README.es.md](../../README.es.md) |
+**Language:** [English](../../README.md) | [Português (Brasil)](../../README.pt-BR.md) | [简体中文](../../README.zh-CN.md) | [繁體中文](../../README.zh-TW.md) | [日本語](../../README.ja.md) | [한국어](../../README.ko.md) | [Türkçe](../../README.tr.md) | [Русский](../../README.ru.md) | [Tiếng Việt](../../README.vi.md) | [ไทย](../../README.th.md) | [Deutsch](../../README.de.md) | [Español](../../README.es.md)
 
-## Synchronization policy
+The complete English documentation is in [`docs/`](../). The complete Simplified Chinese translation is in [`docs/i18n/zh-CN/`](zh-CN/). Other languages currently provide fully synchronized README entry points for installation, capability-gated Codex Desktop continuation, safety boundaries, compatibility, and links to the authoritative detailed documents.
 
-- Update `README.md` first.
-- Keep `translation_of`, `source_revision`, and `last_synced_version` in every translated README.
-- Update every localized README before release when the authoritative README changes materially.
-- Keep commands, paths, JSON keys, model identifiers, enum values, status tokens, and version numbers unchanged.
-- Run `python3 scripts/verify_public_repo.py` to validate metadata, navigation, privacy, and local links.
+Every localized README uses:
+
+- `translation_of: README.md`;
+- `source_revision: docs-v0.5.0-alpha.1`;
+- `last_synced_version: 0.5.0-alpha.1`.
+
+Translation changes must preserve commands, paths, JSON keys, model IDs, reasoning values, decision tuples, state tokens, and the ordered `fork -> send -> readback -> navigate -> archive` contract exactly.

@@ -5,12 +5,12 @@ labels: [routing]
 body:
   - type: markdown
     attributes:
-      value: 只提交 structured profile（结构化画像），不要粘贴私有任务正文或本机 receipt（回执）。
+      value: 只提交 structured profile（结构化画像），不要粘贴私有任务正文、本机 receipt（回执）、reservation marker（预留标记）或原始 reservation_lease（预留租约）。
   - type: input
     id: version
     attributes:
       label: Version（版本）
-      placeholder: 0.4.0-alpha.1
+      placeholder: 0.5.0-alpha.1
     validations:
       required: true
   - type: dropdown
@@ -50,5 +50,5 @@ body:
     attributes:
       label: Privacy confirmation（隐私确认）
       options:
-        - label: 报告不包含任务正文、本机路径、凭据、任务标识或私有 catalog（目录）。
+        - label: 报告不包含任务正文、本机路径、凭据、任务标识、私有 catalog（目录）、receipt（回执）、reservation marker（预留标记）或原始 reservation_lease（预留租约）。
           required: true

@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://public.invalid/auto-route-for-codex/router-input.schema.json",
-  "title": "Public Recommendation Router Input",
+  "$id": "https://github.com/jacob101519/auto-route-for-codex/blob/main/skills/auto-route-for-codex/schemas/router-input.schema.json",
+  "title": "Capability-Gated Codex Router Input",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "current", "profile", "catalog_evidence_status", "host_evidence_status", "host_models", "host_thinking", "host_role_models", "catalog_provenance", "host_provenance"],
+  "required": ["schema_version", "current", "profile", "catalog_evidence_status", "host_evidence_status", "host_surface", "host_capabilities", "host_models", "host_thinking", "host_role_models", "current_provenance", "catalog_provenance", "host_provenance"],
   "properties": {
     "schema_version": {"const": "1.0"},
     "current": {
@@ -17,43 +17,86 @@
         "effort": {"enum": ["unknown", "none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
         "observed_at": {"type": ["string", "null"]}
       },
-      "allOf": [{"if": {"properties": {"evidence_status": {"const": "verified"}}}, "then": {"properties": {"observed_at": {"type": "string", "minLength": 1}}}}]
+      "allOf": [
+        {
+          "if": {"properties": {"evidence_status": {"const": "verified"}}},
+          "then": {"properties": {"observed_at": {"type": "string", "minLength": 1}}}
+        }
+      ]
     },
     "profile": {"$ref": "#/$defs/profile"},
     "catalog_evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]},
     "host_evidence_status": {"enum": ["verified", "stale", "unknown", "uncertain"]},
-    "host_models": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$", "not": {"const": "unknown"}}, "uniqueItems": true},
-    "host_thinking": {"type": "array", "items": {"enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]}, "uniqueItems": true},
-    "host_role_models": {
-      "type": "object", "additionalProperties": false, "required": ["throughput", "balanced", "deep"],
-      "properties": {"throughput": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}, "balanced": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}, "deep": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}}
+    "host_surface": {"enum": ["codex_desktop", "codex_cli", "codex_ide", "codex_cloud", "unknown"]},
+    "host_capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_task_context", "codex_app__fork_thread", "codex_app__send_message_to_thread", "codex_app__read_thread", "codex_app__navigate_to_codex_page", "codex_app__set_thread_archived"],
+      "properties": {
+        "source_task_context": {"type": "boolean"},
+        "codex_app__fork_thread": {"type": "boolean"},
+        "codex_app__send_message_to_thread": {"type": "boolean"},
+        "codex_app__read_thread": {"type": "boolean"},
+        "codex_app__navigate_to_codex_page": {"type": "boolean"},
+        "codex_app__set_thread_archived": {"type": "boolean"}
+      }
     },
-    "catalog_provenance": {"$ref": "#/$defs/catalogProvenance"},
-    "host_provenance": {"$ref": "#/$defs/hostProvenance"}
+    "host_models": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$", "not": {"const": "unknown"}},
+      "uniqueItems": true
+    },
+    "host_thinking": {
+      "type": "array",
+      "items": {"enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+      "uniqueItems": true
+    },
+    "host_role_models": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["throughput", "balanced", "deep"],
+      "properties": {
+        "throughput": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"},
+        "balanced": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"},
+        "deep": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$"}
+      }
+    },
+    "current_provenance": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/currentProvenance"}]},
+    "catalog_provenance": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/catalogProvenance"}]},
+    "host_provenance": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/hostProvenance"}]}
   },
   "$defs": {
-    "catalogProvenance": {
+    "provenanceBase": {
       "type": "object",
       "additionalProperties": false,
       "required": ["schema_version", "receipt_id", "evidence_kind", "source", "observed_at", "ttl_seconds", "content_sha256"],
       "properties": {
         "schema_version": {"const": "1.0"},
         "receipt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
-        "evidence_kind": {"const": "catalog"},
-        "source": {"const": "catalog_observation"},
+        "evidence_kind": {"type": "string"},
+        "source": {"type": "string"},
         "observed_at": {"type": "string", "minLength": 1},
-        "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 604800},
+        "ttl_seconds": {"type": "integer", "minimum": 1},
         "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       }
     },
+    "currentProvenance": {
+      "allOf": [
+        {"$ref": "#/$defs/provenanceBase"},
+        {"properties": {"evidence_kind": {"const": "current_setting"}, "source": {"enum": ["host_current_setting", "local_session_turn_context"]}, "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 600}}}
+      ]
+    },
+    "catalogProvenance": {
+      "allOf": [
+        {"$ref": "#/$defs/provenanceBase"},
+        {"properties": {"evidence_kind": {"const": "catalog"}, "source": {"const": "catalog_observation"}, "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 604800}}}
+      ]
+    },
     "hostProvenance": {
-      "type": "object", "additionalProperties": false,
-      "required": ["schema_version", "receipt_id", "evidence_kind", "source", "observed_at", "ttl_seconds", "content_sha256"],
-      "properties": {
-        "schema_version": {"const": "1.0"}, "receipt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
-        "evidence_kind": {"const": "host_capability"}, "source": {"const": "host_tool_schema"}, "observed_at": {"type": "string", "minLength": 1},
-        "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 600}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
-      }
+      "allOf": [
+        {"$ref": "#/$defs/provenanceBase"},
+        {"properties": {"evidence_kind": {"const": "host_capability"}, "source": {"const": "host_tool_schema"}, "ttl_seconds": {"type": "integer", "minimum": 1, "maximum": 600}}}
+      ]
     },
     "profile": {
       "type": "object",

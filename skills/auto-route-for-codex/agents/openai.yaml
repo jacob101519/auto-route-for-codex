@@ -1,7 +1,7 @@
 interface:
   display_name: "Auto Route for Codex"
-  short_description: "Recommend a public-safe Codex model setting"
-  default_prompt: "$auto-route-for-codex"
+  short_description: "Route Codex work with verified task continuity"
+  default_prompt: "Use $auto-route-for-codex to route this task only when the verified benefit exceeds transfer cost."
 
 policy:
   allow_implicit_invocation: false

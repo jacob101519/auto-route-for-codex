@@ -5,12 +5,12 @@ labels: [routing]
 body:
   - type: markdown
     attributes:
-      value: Share only the structured, privacy-bounded profile. Never paste private task text or local receipts.
+      value: Share only the structured, privacy-bounded profile. Never paste private task text, local receipts, reservation markers, or a raw reservation_lease.
   - type: input
     id: version
     attributes:
       label: Version
-      placeholder: 0.4.0-alpha.1
+      placeholder: 0.5.0-alpha.1
     validations:
       required: true
   - type: dropdown
@@ -50,5 +50,5 @@ body:
     attributes:
       label: Privacy confirmation
       options:
-        - label: The report contains no task prose, local path, credential, session identifier, or private catalog.
+        - label: The report contains no task prose, local path, credential, session identifier, private catalog, receipt, reservation marker, or raw reservation_lease.
           required: true

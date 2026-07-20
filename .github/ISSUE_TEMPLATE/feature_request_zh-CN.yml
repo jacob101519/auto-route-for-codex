@@ -19,7 +19,7 @@ body:
   - type: dropdown
     id: boundary
     attributes:
-      label: 是否保持 recommendation-only（仅建议）的公开边界？
+      label: 是否保持 capability-gated continuation（能力门槛控制的任务继续）与 recommendation-only fallback（仅建议后备行为）？
       options:
         - "Yes（是）"
         - "Unsure（不确定）"

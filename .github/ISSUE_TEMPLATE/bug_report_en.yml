@@ -5,12 +5,12 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: Do not include credentials, private task text, local paths, or session identifiers.
+      value: Do not include credentials, private task text, local paths, session identifiers, receipts, reservation markers, or a raw reservation_lease.
   - type: input
     id: version
     attributes:
       label: Version
-      placeholder: 0.4.0-alpha.1
+      placeholder: 0.5.0-alpha.1
     validations:
       required: true
   - type: dropdown
@@ -48,7 +48,7 @@ body:
     attributes:
       label: Safety checks
       options:
-        - label: I removed credentials, private task text, local paths, and session identifiers.
+        - label: I removed credentials, private task text, local paths, session identifiers, receipts, reservation markers, and any raw reservation_lease.
           required: true
         - label: I confirmed this is not a private security report.
           required: true

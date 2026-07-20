@@ -9,9 +9,18 @@ import re
 import sys
 from pathlib import Path
 
+import yaml
+
+from public_hygiene import (
+    PACKAGE_ALLOWLIST,
+    assert_scanner_self_test,
+    find_private_identifier,
+    find_secret,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.4.0-alpha.1"
+VERSION = "0.5.0-alpha.1"
 SKILL_ROOT = ROOT / "skills" / "auto-route-for-codex"
 README_VARIANTS = (
     ("English", "README.md"),
@@ -65,41 +74,34 @@ REQUIRED_FILES = {
     "NOTICE",
     "PRIVACY.md",
     "README.md",
-    "README.zh-CN.md",
     "ROADMAP.md",
     "SECURITY.md",
     "SUPPORT.md",
     "assets/icon.svg",
     "docs/i18n/README.md",
     "scripts/build_release.py",
+    "scripts/public_hygiene.py",
+    "scripts/tests/test_release_pipeline.py",
     "scripts/verify_public_repo.py",
     "skills/auto-route-for-codex/SKILL.md",
     "skills/auto-route-for-codex/agents/openai.yaml",
     "skills/auto-route-for-codex/schemas/router-input.schema.json",
     "skills/auto-route-for-codex/schemas/router-output.schema.json",
+    "skills/auto-route-for-codex/schemas/transfer-receipt.schema.json",
+    "skills/auto-route-for-codex/schemas/transfer-reservation.schema.json",
     "skills/auto-route-for-codex/scripts/route_task.py",
+    "skills/auto-route-for-codex/scripts/read_current_setting.py",
+    "skills/auto-route-for-codex/scripts/transfer_state.py",
     "skills/auto-route-for-codex/scripts/validate_contracts.py",
     "skills/auto-route-for-codex/tests/fixtures/cases.json",
     "skills/auto-route-for-codex/tests/test_route_task.py",
+    "skills/auto-route-for-codex/tests/test_read_current_setting.py",
+    "skills/auto-route-for-codex/tests/test_transfer_state.py",
     *(source for source, _ in TRANSLATIONS),
     *(translation for _, translation in TRANSLATIONS),
 }
-UUID_PATTERN = re.compile(
-    r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
-)
-SECRET_PATTERNS = (
-    re.compile(r"\b(?:sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{16,})\b"),
-    re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
-    re.compile(r"(?i)\bAuthorization\s*:\s*(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{8,}"),
-    re.compile(
-        r"(?i)\b(?:password|passphrase|api[_-]?key|access[_-]?key|secret[_-]?key)\b"
-        r"\s*[:=]\s*[\"']?[A-Za-z0-9_./+=-]{12,}"
-    ),
-)
 MARKDOWN_LINK = re.compile(r"!?\[[^]]*]\(([^)]+)\)")
-IGNORED_PARTS = {".git", "__pycache__", "dist"}
-PRIVATE_HOME_MARKER = "/" + "Users" + "/"
-LOCAL_MARKETPLACE_MARKER = "codex-" + "local-tools"
+IGNORED_PARTS = {".git", "__pycache__"}
 
 
 def fail(reason: str) -> None:
@@ -117,15 +119,34 @@ def observed_files() -> dict[str, Path]:
     observed: dict[str, Path] = {}
     for path in sorted(ROOT.rglob("*")):
         relative = path.relative_to(ROOT)
-        if any(part in IGNORED_PARTS for part in relative.parts):
-            continue
         if path.is_symlink():
             fail(f"symlink:{relative.as_posix()}")
+        if relative.name == "snapshot-manifest.json":
+            fail(f"private_export_manifest_must_not_be_published:{relative.as_posix()}")
+        if relative.parts and relative.parts[0] == "dist":
+            dist_root = ROOT / "dist"
+            if dist_root.is_symlink() or not dist_root.is_dir():
+                fail("unsafe_ignored_path:dist")
+            continue
+        if any(part in IGNORED_PARTS for part in relative.parts):
+            continue
         if path.is_file():
             observed[relative.as_posix()] = path
     missing = sorted(REQUIRED_FILES - set(observed))
     if missing:
         fail("missing_required_files:" + ",".join(missing))
+    package_observed = {
+        relative
+        for relative in observed
+        if relative in {"LICENSE", "NOTICE"}
+        or relative.startswith((".codex-plugin/", "assets/", "skills/"))
+    }
+    missing_package = sorted(PACKAGE_ALLOWLIST - package_observed)
+    unexpected_package = sorted(package_observed - PACKAGE_ALLOWLIST)
+    if missing_package:
+        fail("missing_package_file:" + ",".join(missing_package))
+    if unexpected_package:
+        fail("unexpected_package_file:" + ",".join(unexpected_package))
     return observed
 
 
@@ -163,6 +184,46 @@ def verify_manifests() -> None:
         fail("skill_display_name")
     if "allow_implicit_invocation: false" not in openai_yaml:
         fail("implicit_invocation_policy")
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    if f"## [{VERSION}] - 2026-07-20" not in changelog:
+        fail("changelog_release_date")
+    citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
+    if f"version: {VERSION}" not in citation or "date-released: 2026-07-20" not in citation:
+        fail("citation_release_metadata")
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    pinned_actions = (
+        "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+        "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405",
+        "actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f",
+    )
+    try:
+        workflow_document = yaml.safe_load(workflow)
+    except yaml.YAMLError:
+        fail("ci_workflow_yaml")
+
+    observed_actions: list[str] = []
+    visited: set[int] = set()
+
+    def collect_uses(value: object) -> None:
+        if isinstance(value, (dict, list)):
+            identity = id(value)
+            if identity in visited:
+                return
+            visited.add(identity)
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key == "uses":
+                    if not isinstance(child, str):
+                        fail("ci_action_set_or_pin")
+                    observed_actions.append(child)
+                collect_uses(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_uses(child)
+
+    collect_uses(workflow_document)
+    if tuple(observed_actions) != pinned_actions:
+        fail("ci_action_set_or_pin")
 
 
 def frontmatter(text: str) -> dict[str, str]:
@@ -188,7 +249,7 @@ def verify_translations() -> None:
         fields = frontmatter(translation_path.read_text(encoding="utf-8"))
         expected = {
             "translation_of": source,
-            "source_revision": "docs-v0.4.0-alpha.1",
+            "source_revision": "docs-v0.5.0-alpha.1",
             "last_synced_version": VERSION,
         }
         if fields != expected:
@@ -203,11 +264,23 @@ def verify_language_navigation() -> None:
     source_table_rows = sum(line.startswith("| ") for line in source_text.splitlines())
     source_links = len(MARKDOWN_LINK.findall(source_text))
     required_tokens = (
-        "codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.4.0-alpha.1",
+        "codex plugin marketplace add jacob101519/auto-route-for-codex --ref v0.5.0-alpha.1",
         "codex plugin add auto-route-for-codex@jacob101519",
         "$auto-route-for-codex",
-        "v0.4.0-alpha.1",
-        "stay + none|efficiency + none + keep",
+        "v0.5.0-alpha.1",
+        "fork_created",
+        "navigation_confirmed",
+        "source_archive_confirmed",
+        "pending_reservation",
+        "reservation_lease",
+        "--reservation-lease",
+        "$CODEX_HOME/state/auto-route-for-codex",
+        "AUTO_ROUTE_STATE_HOME",
+        "host_capabilities.source_task_context=true",
+        "CODEX_THREAD_ID",
+        "source_binding_sha256",
+        "fsync",
+        "recommendation-only",
         ".codex-plugin/plugin.json",
         ".agents/plugins/marketplace.json",
         "skills/auto-route-for-codex/",
@@ -215,6 +288,10 @@ def verify_language_navigation() -> None:
         "scripts/verify_public_repo.py",
         "scripts/build_release.py",
         "SHA256SUMS",
+    )
+    forbidden_text = (
+        "never forks, creates, navigates, archives, or replays a task",
+        "public edition is deliberately recommendation-only",
     )
     for _, current in README_VARIANTS:
         text = (ROOT / current).read_text(encoding="utf-8")
@@ -243,6 +320,42 @@ def verify_language_navigation() -> None:
         for token in required_tokens:
             if token not in text:
                 fail(f"readme_required_token:{current}:{token}")
+        folded = text.casefold()
+        for forbidden in forbidden_text:
+            if forbidden in folded:
+                fail(f"obsolete_recommendation_only_claim:{current}")
+
+
+def verify_transfer_disclosure() -> None:
+    disclosure_files = (
+        "README.md",
+        "PRIVACY.md",
+        "docs/architecture.md",
+        "docs/privacy-and-data-flow.md",
+        "skills/auto-route-for-codex/SKILL.md",
+    )
+    required = (
+        "ephemeral coordination nonce",
+        "private local CLI",
+        "not a credential",
+        "unsupported internals",
+        "stale evidence",
+        "host_capabilities.source_task_context=true",
+        "CODEX_THREAD_ID",
+        "source_binding_sha256",
+        "raw source identifier",
+    )
+    for relative in disclosure_files:
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        if any(token not in text for token in required):
+            fail(f"incomplete_transfer_disclosure:{relative}")
+    skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    forbidden = (
+        "raw `reservation_lease` into the plugin package, repository, logs, telemetry, or user-facing output",
+        "raw `reservation_lease` in package, repository, telemetry, logs, or user-facing output",
+    )
+    if any(value in skill for value in forbidden):
+        fail("obsolete_lease_nonvisibility_claim")
 
 
 def verify_privacy(files: dict[str, Path]) -> int:
@@ -252,12 +365,32 @@ def verify_privacy(files: dict[str, Path]) -> int:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             fail(f"non_utf8_source:{relative}")
-        if PRIVATE_HOME_MARKER in text or LOCAL_MARKETPLACE_MARKER in text or UUID_PATTERN.search(text):
-            fail(f"private_identifier:{relative}")
-        if any(pattern.search(text) for pattern in SECRET_PATTERNS):
-            fail(f"secret_value:{relative}")
+        private_kind = find_private_identifier(text)
+        if private_kind:
+            fail(f"private_identifier:{relative}:{private_kind}")
+        secret_kind = find_secret(text)
+        if secret_kind:
+            fail(f"secret_value:{relative}:{secret_kind}")
         scanned += 1
     return scanned
+
+
+def verify_package_ascii(files: dict[str, Path]) -> int:
+    package_roots = (".codex-plugin/", "assets/", "skills/")
+    package_files = {
+        "LICENSE",
+        "NOTICE",
+    }
+    checked = 0
+    for relative, path in files.items():
+        if relative not in package_files and not relative.startswith(package_roots):
+            continue
+        try:
+            path.read_bytes().decode("ascii")
+        except UnicodeDecodeError:
+            fail(f"non_ascii_package_file:{relative}")
+        checked += 1
+    return checked
 
 
 def verify_markdown_links(files: dict[str, Path]) -> int:
@@ -290,17 +423,24 @@ def verify_license() -> str:
 
 
 def main() -> int:
+    try:
+        assert_scanner_self_test()
+    except ValueError as exc:
+        fail(str(exc))
     files = observed_files()
     verify_manifests()
     verify_translations()
     verify_language_navigation()
+    verify_transfer_disclosure()
     scanned = verify_privacy(files)
+    package_ascii = verify_package_ascii(files)
     links = verify_markdown_links(files)
     summary = {
         "status": "pass",
         "version": VERSION,
         "files": len(files),
         "privacy_scanned": scanned,
+        "package_ascii_files": package_ascii,
         "translation_pairs": len(TRANSLATIONS),
         "readme_locales": len(README_VARIANTS),
         "local_links_checked": links,
